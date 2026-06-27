@@ -1,1 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  >
+
+  <title>CONGREGA</title>
+
+  <meta name="theme-color" content="#5B3C88">
+  <meta name="background-color" content="#1F1F24">
+  <meta name="color-scheme" content="light">
+
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./icon-192.png">
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      --cor-principal: #5B3C88;
+      --cor-principal-clara: #7D59BA;
+      --fundo-app: #1F1F24;
+      --fundo-app-2: #292931;
+      --texto-principal: #ffffff;
+      --texto-secundario: rgba(255, 255, 255, 0.72);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(91, 60, 136, 0.28), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(91, 60, 136, 0.18), transparent 36%),
+        linear-gradient(135deg, var(--fundo-app), var(--fundo-app-2));
+      color: var(--texto-principal);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
+      color-scheme: light;
+    }
+
+    .pwa-shell {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #1F1F24;
+      overflow: hidden;
+    }
+
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+      gap: 18px;
+      padding: 24px;
+
+      background:
+        radial-gradient(circle at top left, rgba(91, 60, 136, 0.34), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(91, 60, 136, 0.22), transparent 38%),
+        linear-gradient(135deg, #1F1F24, #292931);
+
+      transition:
+        opacity 0.35s ease,
+        visibility 0.35s ease;
+    }
+
+    .loading-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .loading-card {
+      width: min(360px, calc(100vw - 32px));
+      min-height: 220px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+      gap: 18px;
+      padding: 28px 24px;
+      border-radius: 28px;
+
+      background:
+        linear-gradient(145deg, rgba(91, 60, 136, 0.30), rgba(31, 31, 36, 0.60)),
+        rgba(91, 60, 136, 0.36);
+
+      border: 1px solid rgba(91, 60, 136, 0.92);
+
+      box-shadow:
+        0 16px 42px rgba(0, 0, 0, 0.34),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      text-align: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .loading-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(135deg,
+          rgba(255, 255, 255, 0.32) 0%,
+          transparent 22%,
+          transparent 72%,
+          rgba(255, 255, 255, 0.08) 100%);
+      opacity: 0.22;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      position: relative;
+      z-index: 2;
+
+      width: 86px;
+      height: 86px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 22px;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.12), transparent),
+        rgba(91, 60, 136, 0.42);
+
+      border: 1px solid rgba(91, 60, 136, 0.92);
+
+      box-shadow:
+        0 8px 24px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .loading-logo img {
+      width: 72%;
+      height: 72%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .loading-title {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .loading-title strong {
+      font-size: 1.7rem;
+      font-weight: 900;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-shadow: 0 0 18px rgba(91, 60, 136, 0.72);
+    }
+
+    .loading-title span {
+      font-size: 0.94rem;
+      color: var(--texto-secundario);
+      font-weight: 700;
+    }
+
+    .loading-spinner {
+      position: relative;
+      z-index: 2;
+
+      width: 32px;
+      height: 32px;
+
+      border-radius: 999px;
+      border: 3px solid rgba(255, 255, 255, 0.18);
+      border-top-color: #ffffff;
+
+      animation: girar 0.78s linear infinite;
+    }
+
+    .app-frame {
+      position: fixed;
+      inset: 0;
+
+      width: 100%;
+      height: 100%;
+
+      border: none;
+      outline: none;
+
+      background: #1F1F24;
+    }
+
+    .fallback-message {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+
+      z-index: 10;
+
+      width: min(520px, calc(100vw - 32px));
+      padding: 12px 14px;
+      border-radius: 16px;
+
+      display: none;
+
+      background: rgba(5, 6, 20, 0.88);
+      color: #ffffff;
+      border: 1px solid rgba(91, 60, 136, 0.72);
+
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-align: center;
+
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+    }
+
+    .fallback-message.show {
+      display: block;
+    }
+
+    @keyframes girar {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="pwa-shell">
+    <section id="loadingScreen" class="loading-screen">
+      <div class="loading-card">
+        <div class="loading-logo">
+          <img src="./icon-192.png" alt="Logo CONGREGA">
+        </div>
+
+        <div class="loading-title">
+          <strong>CONGREGA</strong>
+          <span>Carregando assistente congregacional...</span>
+        </div>
+
+        <div class="loading-spinner" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <iframe
+      id="appFrame"
+      class="app-frame"
+      title="CONGREGA"
+      allow="clipboard-read; clipboard-write"
+    ></iframe>
+
+    <div id="fallbackMessage" class="fallback-message">
+      Se o CONGREGA não carregar, confira se a implantação do Apps Script está publicada como Web App e se o doGet permite iframe.
+    </div>
+  </main>
+
+  <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyp2ZVGXlY3nPVqCYZpIKDnAmwascZa9dihG1y9ciU9a-R3djO_80kdhASWd1zToAVY/exec';
+
+    const appFrame = document.getElementById('appFrame');
+    const loadingScreen = document.getElementById('loadingScreen');
+    const fallbackMessage = document.getElementById('fallbackMessage');
+
+    function carregarCongrega() {
+      if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.includes('COLE_AQUI')) {
+        loadingScreen.classList.add('hidden');
+        fallbackMessage.classList.add('show');
+        fallbackMessage.textContent = 'Configure a URL /exec do Web App CONGREGA no arquivo index.html.';
+        return;
+      }
+
+      appFrame.src = APPS_SCRIPT_URL;
+    }
+
+    appFrame.addEventListener('load', function() {
+      setTimeout(function() {
+        loadingScreen.classList.add('hidden');
+      }, 450);
+    });
+
+    setTimeout(function() {
+      if (!loadingScreen.classList.contains('hidden')) {
+        fallbackMessage.classList.add('show');
+      }
+    }, 9000);
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker
+          .register('./sw.js')
+          .catch(function(error) {
+            console.warn('Service worker não registrado:', error);
+          });
+      });
+    }
+
+    carregarCongrega();
+  </script>
+</body>
+</html>
